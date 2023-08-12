@@ -2,9 +2,20 @@
 <html>
 <head>
     <title>Twitter Reply</title>
+    <style>
+        #reply-link {
+            display: inline-block;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+    </style>
 </head>
 <body>
-    <a id="reply-link" href="https://twitter.com/intent/tweet?text=Hello%20world">Reply</a>
+    <a id="reply-link" href="#">Reply</a>
 
     <script>
         // List of predefined sentences with different tones
@@ -25,9 +36,4 @@
         const randomIndex = Math.floor(Math.random() * sentences.length);
         const randomSentence = encodeURIComponent(sentences[randomIndex]);
 
-        // Update the link's href with the randomly generated sentence
-        const replyLink = document.getElementById("reply-link");
-        replyLink.href += randomSentence;
-    </script>
-</body>
-</html>
+        // Update the link's href with the randomly
