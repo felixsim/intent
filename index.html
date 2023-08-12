@@ -36,4 +36,15 @@
         const randomIndex = Math.floor(Math.random() * sentences.length);
         const randomSentence = encodeURIComponent(sentences[randomIndex]);
 
-        // Update the link's href with the randomly
+        // Update the link's href with the randomly generated sentence
+        const replyLink = document.getElementById("reply-link");
+        replyLink.href = `https://twitter.com/intent/tweet?text=${randomSentence}`;
+
+        // Open the link in a small inline window when clicked
+        replyLink.addEventListener("click", function(event) {
+            event.preventDefault();
+            window.open(replyLink.href, "Twitter Reply", "width=400,height=300,resizable,scrollbars");
+        });
+    </script>
+</body>
+</html>
