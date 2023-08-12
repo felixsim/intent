@@ -4,47 +4,93 @@
     <title>Twitter Reply</title>
     <style>
         #reply-link {
-            display: inline-block;
+            display: none;
             padding: 5px 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             text-decoration: none;
             color: #333;
             background-color: #f9f9f9;
+            margin-bottom: 10px;
+        }
+        #proposed-sentence {
+            font-style: italic;
+        }
+        #loading-container {
+            display: block;
+            text-align: center;
+            margin: 20px;
+        }
+        .loading-spinner {
+            display: inline-block;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #333;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <a id="reply-link" href="#">Reply</a>
+    <div id="loading-container">
+        <div class="loading-spinner"></div>
+        <div>Loading...</div>
+    </div>
+    <a id="reply-link" href="#" target="_blank">Reply</a>
+    <div id="proposed-sentence"></div>
 
     <script>
-        // List of predefined sentences with different tones
-        const sentences = [
-            "Impressive! Both @binance and @BNBCHAIN are giving you a nod for your dedication. Keep going strong!",
-            "Well done! Your efforts haven't gone unnoticed, and both @binance and @BNBCHAIN are recognizing your impact.",
-            "Exciting news! Your hard work has caught the attention of @binance and @BNBCHAIN. You're making waves!",
-            "Quite the accomplishment! @binance and @BNBCHAIN's recognition is proof of your influence in the crypto space.",
-            "A moment to celebrate! @binance and @BNBCHAIN's acknowledgment underlines your significant contributions.",
-            "You're on the right track! The recognition from @binance and @BNBCHAIN underscores your credibility.",
-            "Hats off to you! Earning recognition from @binance and @BNBCHAIN reflects your lasting impact on the crypto world.",
-            "Impressive journey! Both @binance and @BNBCHAIN have taken notice of your remarkable dedication.",
-            "Achievement unlocked! @binance and @BNBCHAIN's recognition echoes your influence and innovation.",
-            "Major achievement! @binance and @BNBCHAIN are confirming your noteworthy contributions to the crypto community."
-        ];
+        async function generateSentence(prompt, apiKey) {
+            const response = await fetch("https://api.openai.com/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: "gpt-3.5-turbo",
+                    messages: [{ role: "system", content: "You are a helpful assistant." }, { role: "user", content: prompt }]
+                })
+            });
 
-        // Randomly select a sentence from the list
-        const randomIndex = Math.floor(Math.random() * sentences.length);
-        const randomSentence = encodeURIComponent(sentences[randomIndex]);
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
 
-        // Update the link's href with the randomly generated sentence
-        const replyLink = document.getElementById("reply-link");
-        replyLink.href = `https://twitter.com/intent/tweet?text=${randomSentence}`;
+        async function init() {
+            const loadingContainer = document.getElementById("loading-container");
+            const replyLink = document.getElementById("reply-link");
+            const proposedSentence = document.getElementById("proposed-sentence");
 
-        // Open the link in a small inline window when clicked
-        replyLink.addEventListener("click", function(event) {
-            event.preventDefault();
-            window.open(replyLink.href, "Twitter Reply", "width=400,height=300,resizable,scrollbars");
-        });
+            const prompt = "Generate a sentence in reply to the original tweet saying that they are being recognized by @binance and @BNBCHAIN. Use a positive tone and tone of voice picked randomly from the top 10 twitter influencers. limit to 100 characters. no emoji, no hashtags, no quotation marks or inverted commas. do not mention the tone in your reply. do not use any hashtags in your reply. do not use any emojis in your reply. mention binance and bnbchain randomly. use sentences with a max of 5 words.";
+            const apiKey = getApiKeyFromUrl(); // Fetch the API key from the URL
+
+            loadingContainer.style.display = "block";
+            replyLink.style.display = "none";
+
+            // Generate the sentence using ChatGPT with the specified prompt
+            const generatedSentence = await generateSentence(prompt, apiKey);
+
+            loadingContainer.style.display = "none";
+            replyLink.style.display = "inline-block";
+            proposedSentence.textContent = `Proposed Sentence: "${generatedSentence}"`;
+
+            // Update the link's href with the generated sentence
+            const inReplyToId = "1680906394982297600"; // Replace with the desired tweet ID
+            replyLink.href = `https://twitter.com/intent/tweet?in_reply_to=${inReplyToId}&text=${encodeURIComponent(generatedSentence)}`;
+        }
+
+        function getApiKeyFromUrl() {
+            const url = new URL(window.location.href);
+            return url.searchParams.get("api");
+        }
+
+        window.addEventListener("load", init);
     </script>
 </body>
 </html>
