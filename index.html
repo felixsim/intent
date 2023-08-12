@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Twitter Reply</title>
+</head>
+<body>
+    <a id="reply-link" href="https://twitter.com/intent/tweet?in_reply_to=1680906394982297600&text=">Reply</a>
+
+    <script>
+        // List of predefined sentences
+        const sentences = [
+            "Good morning, world!",
+            "Hello, everyone!",
+            "Top of the morning to you!",
+            "Rise and shine, folks!",
+            "Greetings, beautiful day!"
+        ];
+
+        // Randomly select a sentence from the list
+        const randomIndex = Math.floor(Math.random() * sentences.length);
+        const randomSentence = encodeURIComponent(sentences[randomIndex]);
+
+        // Update the link's href with the randomly generated sentence
+        const replyLink = document.getElementById("reply-link");
+        replyLink.href += randomSentence;
+    </script>
+</body>
+</html>
